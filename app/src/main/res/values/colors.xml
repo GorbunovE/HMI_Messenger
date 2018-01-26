@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--https://www.materialpalette.com/-->
 <resources>
-    <color name="colorPrimary">#000</color>
-    <color name="colorPrimaryDark">#000</color>
-    <color name="colorAccent">#3dca00</color>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FF669900</color>
 </resources>

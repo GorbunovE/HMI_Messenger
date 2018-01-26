@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://C:\Users\Danila\Desktop\FirebaseAndroidChat_public-master\FirebaseAndroidChat (public).iml" filepath="C:\Users\Danila\Desktop\FirebaseAndroidChat_public-master\FirebaseAndroidChat (public).iml" />
+      <module fileurl="file://D:\HMI_Messenger\FirebaseAndroidChat_public-master.iml" filepath="D:\HMI_Messenger\FirebaseAndroidChat_public-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/HMI_Messenger.iml" filepath="$PROJECT_DIR$/HMI_Messenger.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

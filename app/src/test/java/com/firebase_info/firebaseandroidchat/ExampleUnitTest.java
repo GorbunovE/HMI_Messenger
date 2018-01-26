@@ -1,4 +1,4 @@
-package com.example.gorbunov.hmi_messenger;
+package com.firebase_info.firebaseandroidchat;
 
 import org.junit.Test;
 
