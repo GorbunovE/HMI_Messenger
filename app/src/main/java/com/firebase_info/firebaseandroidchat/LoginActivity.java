@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public boolean checkEmail (String email)  {
-        String str = "^([a-zA-Z0-9]+[\\w.-])*@([a-zA-Z0-9]+[\\w.-])+.([a-z]{2,6})$";
+        String str = "^([a-zA-Z0-9]+[\\w.-]*)@([a-zA-Z0-9]+[\\w.-])+.([a-z]{2,6})$";
         Pattern check = Pattern.compile(str);
         Matcher ce = check.matcher(email);
         return ce.matches();

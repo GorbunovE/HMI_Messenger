@@ -1,5 +1,7 @@
 package com.firebase_info.firebaseandroidchat;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 9. Устанавливаем слушатель клика на кнопку, создаем сообщение, отправляем сообщение в базу, удаляем текст
         mSendButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
             @Override
             public void onClick(View view) {
                 if(mMessageEditText.getText().toString().startsWith("/to")){
@@ -135,15 +138,22 @@ public class MainActivity extends AppCompatActivity {
                 mMessageDatabaseReference.push().setValue(new Message(mMessageEditText.getText().toString().replace("/to "+str[1]+" ",""),user.getEmail(),str[1]));
                 mMessageEditText.setText("");
                 }
-
+                else if(mMessageEditText.getText().toString().startsWith("/weather")) {
+                    str_weather =mMessageEditText.getText().toString().split(" ");
+                    new ParseTask().execute();
+                    mMessageEditText.setText("");
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                }
                 else if(mMessageEditText.getText().toString().startsWith("/справка")){
                     String info = "________________________\n" +
                             "ИНФОРМАЦИЯ \n" +
                             "________________________\n\n" +
                             "Для отправки сообщения нажмите кнопку 'Send'\n" +
                             "Для отправки личного сообщения введите '/to <email получателя> <Текст сообщения>'\n" +
+                            "Для получения информации по погоде введите '/weather <Название города>'\n\n" +
                             "Данное приложение было разработанно в ознакомительных целях\n" +
                             "________________________";
+                    mMessageAdapter.add(new Message(info,"Погода",user.getEmail()));
                     mMessageEditText.setText("");
                 }
                 else{
@@ -188,6 +198,85 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //json
+    private class ParseTask extends AsyncTask<Void, Void, String> {
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String resultJson = "";
+
+        @Override
+        protected String doInBackground(Void... params) {
+            // получаем данные с внешнего ресурса
+            try {
+                URL url = new URL("http://belindn-dev.tk/?city="+str_weather[1]);
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+
+                resultJson = buffer.toString();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return resultJson;
+        }
+
+        public String WeatherDay(int n){
+            String result = "";
+            if (n==0) {result = "сегодня";}
+            else if (n==1) {result = "завтра";}
+            else if (n == 2){result = "послезавтра";}
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String strJson) {
+            super.onPostExecute(strJson);
+            // выводим целиком полученную json-строку
+            Log.d(LOG_TAG, strJson);
+
+
+            JSONObject dataJsonObj = null;
+
+            try {
+                dataJsonObj = new JSONObject(strJson);
+                JSONArray weather = dataJsonObj.getJSONArray("wheather");
+                String full_weather = str_weather[1]+"\n\n";
+                // 2. перебираем и выводим контакты каждого друга
+                for (int i = 0; i < weather.length(); i++) {
+
+
+                    JSONObject wh = weather.getJSONObject(i);
+
+
+                    String temp = wh.getString("temp");
+                    String temp_night = wh.getString("temp_night");
+                    String ws = wh.getString("wind_speed");
+                    full_weather += "Погода "+WeatherDay(i)+": \n" +
+                            "Температура: "+ temp + "С°\n" +
+                            "Температура ночью: " + temp_night + "С°\n" +
+                            "Скорость ветра: "+ws+" м/с\n" +
+                            "______________________________"+"\n";
+                }
+                //mMessageDatabaseReference.push().setValue(new Message(full_weather,"Погода",user.getEmail()));
+                mMessageAdapter.add(new Message(full_weather,"Погода",user.getEmail()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private class GetTok extends AsyncTask<Void, Void, String> {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
